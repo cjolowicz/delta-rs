@@ -1423,6 +1423,8 @@ pub(super) mod zorder {
         }
     }
 
+    static ZORDER_BYTES_PER_COLUMN: usize = 16;
+
     /// Creates a new binary array containing the zorder keys for the given columns
     ///
     /// Each value is 16 bytes * number of columns. Each column is converted into
@@ -1445,7 +1447,7 @@ pub(super) mod zorder {
         }
 
         // We are taking 128 bits (16 bytes) from each value. Shorter values will be padded.
-        let value_size: usize = columns.len() * 16;
+        let value_size: usize = columns.len() * ZORDER_BYTES_PER_COLUMN;
 
         // Initialize with zeros
         let mut out: Vec<u8> = vec![0; out_length * value_size];
@@ -1487,8 +1489,8 @@ pub(super) mod zorder {
 
         for (row_i, row) in rows.iter().enumerate() {
             // How many bytes to get to this row's out position
-            let row_offset = row_i * num_columns * 16;
-            for bit_i in 0..128 {
+            let row_offset = row_i * num_columns * ZORDER_BYTES_PER_COLUMN;
+            for bit_i in 0..(8 * ZORDER_BYTES_PER_COLUMN) {
                 let bit = row.get_bit(bit_i);
                 // Position of bit within the value. We place a value every
                 // `num_columns` bits, offset by `col_pos` when interleaving.
@@ -1572,8 +1574,8 @@ pub(super) mod zorder {
             assert_eq!(result.null_count(), 0);
 
             let data: &BinaryArray = as_generic_binary_array(result.as_ref());
-            assert_eq!(data.value_data().len(), 3 * 16 * 3);
-            assert!(data.iter().all(|x| x.unwrap().len() == 3 * 16));
+            assert_eq!(data.value_data().len(), 3 * ZORDER_BYTES_PER_COLUMN * 3);
+            assert!(data.iter().all(|x| x.unwrap().len() == 3 * ZORDER_BYTES_PER_COLUMN));
         }
 
         #[tokio::test]
