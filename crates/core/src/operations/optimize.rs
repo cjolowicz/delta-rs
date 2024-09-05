@@ -1423,7 +1423,7 @@ pub(super) mod zorder {
         }
     }
 
-    static ZORDER_BYTES_PER_COLUMN: usize = 16;
+    static ZORDER_BYTES_PER_COLUMN: usize = 22;
 
     /// Creates a new binary array containing the zorder keys for the given columns
     ///
