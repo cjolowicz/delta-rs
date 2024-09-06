@@ -632,6 +632,10 @@ impl MergePlan {
         ));
         let df = df.with_column(ZORDER_KEY_COLUMN, expr)?;
 
+        debug!("=======================================================");
+        df.clone().show().await?;
+        debug!("=======================================================");
+
         let df = df.sort(vec![col(ZORDER_KEY_COLUMN).sort(true, true)])?;
         let df = df.select(original_columns)?;
 
